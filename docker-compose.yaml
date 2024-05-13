@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # Spring Boot application service
+  app:
+    # Build from a Dockerfile in the current directory
+    build: .
+    # Map port 8080 on the host to 8080 in the container
+    ports:
+      - "8080:8080"
+    # Set environment variables for database connection
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/mydatabase
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    # Specify dependencies to ensure PostgreSQL starts before the app
+    depends_on:
+      - db
+
+  # PostgreSQL database service
+  db:
+    image: postgres:15  # Use the official PostgreSQL image, version 15
+    # Set environment variables for PostgreSQL configuration
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    # Expose the PostgreSQL port for internal communication (optional)
+    ports:
+      - "5433:5432"  #
