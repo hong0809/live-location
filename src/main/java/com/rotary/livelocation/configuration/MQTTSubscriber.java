@@ -43,19 +43,23 @@ public class MQTTSubscriber {
                         return;
                     }
                     log.info("topic {}", s);
-                    log.info("mqtt message {}:", new String(mqttMessage.getPayload(), StandardCharsets.UTF_8));
+//                    log.info("mqtt message {}:", new String(mqttMessage.getPayload(), StandardCharsets.UTF_8));
                     ServiceEnvelope envelope = ServiceEnvelope.parseFrom(mqttMessage.getPayload());
-                    log.info("envelope ={}", envelope.getPacket());
+                    log.info("envelope = {}", envelope.getPacket().getDecoded().getPortnum().toString());
                     try {
-                        decrypt(envelope.getPacket());
+//                        decrypt(envelope.getPacket());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     try{
                         if (envelope.getPacket().getDecoded().getPortnum().name().equals("POSITION_APP")) {
                             Position position = Position.parseFrom(envelope.getPacket().getDecoded().getPayload());
-                            log.info("position = {}", position);
+//                            log.info("position = {}", position);
+                        } else if (envelope.getPacket().getDecoded().getPortnum().name().equals("MAP_REPORT_APP")) {
+                            MapReport map = MapReport.parseFrom(envelope.getPacket().getDecoded().getPayload());
+                            log.info("map = {}", map);
                         }
+                        Telemetry
                         Data datax = Data.parseFrom(envelope.getPacket().getDecoded().getPayload());
                     } catch (Exception e) {
                         e.printStackTrace();
