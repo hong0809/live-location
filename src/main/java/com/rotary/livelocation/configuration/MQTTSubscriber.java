@@ -1,8 +1,6 @@
 package com.rotary.livelocation.configuration;
 
-import build.buf.gen.meshtastic.Data;
-import build.buf.gen.meshtastic.MeshPacket;
-import build.buf.gen.meshtastic.ServiceEnvelope;
+import build.buf.gen.meshtastic.*;
 import com.rotary.livelocation.mqtt.MQTTClient;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -14,22 +12,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UTFDataFormatException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.function.BiConsumer;
 
-import static org.springframework.cache.interceptor.SimpleKeyGenerator.generateKey;
+import java.util.Base64;
 
 @Configuration
 @Slf4j
@@ -44,18 +32,35 @@ public class MQTTSubscriber {
 
     @PostConstruct
     public void subscribeToTopic() {
-        String topic = "msh/+/+/LongFast/+"; // Specify the MQTT topic you want to subscribe to
+        String topic = "msh/ANZCC/#"; // Specify the MQTT topic you want to subscribe to
 
         try {
             // Subscribe to the topic using the MQTTClient
             mqttClient.subscribe(topic, new IMqttMessageListener() {
                 @Override
                 public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+                    if (s.contains("/stat")) {
+                        return;
+                    }
                     log.info("topic {}", s);
                     log.info("mqtt message {}:", new String(mqttMessage.getPayload(), StandardCharsets.UTF_8));
                     ServiceEnvelope envelope = ServiceEnvelope.parseFrom(mqttMessage.getPayload());
                     log.info("envelope ={}", envelope.getPacket());
-                    decrypt(envelope.getPacket());
+                    try {
+                        decrypt(envelope.getPacket());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    try{
+                        if (envelope.getPacket().getDecoded().getPortnum().name().equals("POSITION_APP")) {
+                            Position position = Position.parseFrom(envelope.getPacket().getDecoded().getPayload());
+                            log.info("position = {}", position);
+                        }
+                        Data datax = Data.parseFrom(envelope.getPacket().getDecoded().getPayload());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 }
             });
         } catch (Exception e) {
@@ -98,10 +103,10 @@ public class MQTTSubscriber {
         ByteBuffer buffer = ByteBuffer.allocate(16);
 
         buffer.putLong(l);
-//        buffer.putInt(0);
         buffer.putInt(packet.getFrom());
         buffer.putInt(0);
         return buffer.array();
     }
+
 
 }
