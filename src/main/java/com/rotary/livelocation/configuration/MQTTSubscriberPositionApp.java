@@ -3,6 +3,7 @@ package com.rotary.livelocation.configuration;
 import build.buf.gen.meshtastic.*;
 import com.rotary.livelocation.mqtt.MQTTClient;
 import com.rotary.livelocation.service.PositionService;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -14,27 +15,26 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-
 import java.util.Base64;
 
 @Configuration
 @Slf4j
-public class MQTTSubscriber {
+public class MQTTSubscriberPositionApp {
     private final MQTTClient mqttClient;
+
+    @Autowired
+    public MQTTSubscriberPositionApp(MQTTClient mqttClient) {
+        this.mqttClient = mqttClient;
+    }
 
     @Autowired
     PositionService positionService;
 
-    @Autowired
-    public MQTTSubscriber(MQTTClient mqttClient) {
-        this.mqttClient = mqttClient;
-    }
 
-
-//    @PostConstruct
+    @PostConstruct
     public void subscribeToTopic() {
         String topic = "msh/ANZCC/#"; // Specify the MQTT topic you want to subscribe to
-
+        log.info("start subscribe topic {}: ", topic);
         try {
             // Subscribe to the topic using the MQTTClient
             mqttClient.subscribe(topic, new IMqttMessageListener() {
@@ -46,22 +46,16 @@ public class MQTTSubscriber {
                     log.info("topic {}", s);
 //                    log.info("mqtt message {}:", new String(mqttMessage.getPayload(), StandardCharsets.UTF_8));
                     ServiceEnvelope envelope = ServiceEnvelope.parseFrom(mqttMessage.getPayload());
-                    log.info("envelope = {}", envelope.getPacket().getDecoded().getPortnum().toString());
-                    try {
-//                        decrypt(envelope.getPacket());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    log.info("envelope = {}", envelope);
                     try{
                         if (envelope.getPacket().getDecoded().getPortnum().name().equals("POSITION_APP")) {
-
+                            positionService.updateLocation(envelope);
                             Position position = Position.parseFrom(envelope.getPacket().getDecoded().getPayload());
                             log.info("position = {}", position);
                         } else if (envelope.getPacket().getDecoded().getPortnum().name().equals("MAP_REPORT_APP")) {
                             MapReport map = MapReport.parseFrom(envelope.getPacket().getDecoded().getPayload());
                             log.info("map = {}", map);
                         }
-
                         Data datax = Data.parseFrom(envelope.getPacket().getDecoded().getPayload());
                     } catch (Exception e) {
                         e.printStackTrace();
