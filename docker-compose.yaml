@@ -10,7 +10,7 @@ services:
       - "8080:8080"
     # Set environment variables for database connection
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5431/locationdb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/locationdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
@@ -28,4 +28,4 @@ services:
       POSTGRES_DB: locationdb
     # Expose the PostgreSQL port for internal communication (optional)
     ports:
-      - "5431:5432"  #
+      - "5433:5432"  #
