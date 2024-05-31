@@ -9,4 +9,6 @@ import java.util.List;
 public interface LocationRepository extends JpaRepository<Location, Long> {
 
     Location findByNodeId(String nodeId);
+
+    Location findyByFrom(String from);
 }
