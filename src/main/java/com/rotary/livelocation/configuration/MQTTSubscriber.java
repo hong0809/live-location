@@ -34,7 +34,6 @@ public class MQTTSubscriber {
 //    @PostConstruct
     public void subscribeToTopic() {
         String topic = "msh/ANZCC/#"; // Specify the MQTT topic you want to subscribe to
-
         try {
             // Subscribe to the topic using the MQTTClient
             mqttClient.subscribe(topic, new IMqttMessageListener() {

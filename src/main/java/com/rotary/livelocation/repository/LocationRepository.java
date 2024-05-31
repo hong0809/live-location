@@ -9,5 +9,5 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
 
     Location findByNodeId(String nodeId);
 
-    Location findyByNodeF(String nodeF);
+    Location findByNodeF(String from);
 }
