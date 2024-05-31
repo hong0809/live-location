@@ -10,13 +10,15 @@ services:
       - "8080:8080"
     # Set environment variables for database connection
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/locationdb
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
+      #SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/locationdb
+      #SPRING_DATASOURCE_USERNAME: postgres
+      #SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_URL: jdbc:postgresql://aws-0-ap-southeast-2.pooler.supabase.com:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres.swbmgfdwwhiswbgeilfn
+      SPRING_DATASOURCE_PASSWORD: DfqS+2D9P5%2&!/
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-    # Specify dependencies to ensure PostgreSQL starts before the app
-    depends_on:
-      - db
+#    depends_on:
+#      - db
 
   # PostgreSQL database service
   db:
