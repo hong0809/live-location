@@ -20,7 +20,7 @@ public class PositionService {
     public void updateLocation(ServiceEnvelope envelope) throws InvalidProtocolBufferException {
         long id = envelope.getPacket().getId();
         String from = String.valueOf(envelope.getPacket().getFrom());
-        Location location = locationRepository.findyByFrom(from);
+        Location location = locationRepository.findyByNodeF(from);
         Position position = Position.parseFrom(envelope.getPacket().getDecoded().getPayload());
         if (location == null) {
             location = new Location();
@@ -30,7 +30,7 @@ public class PositionService {
         location.setLongitude(position.getLongitudeI() / PRECISION);
         location.setLatitude(position.getLatitudeI() / PRECISION);
         location.setTimestamp(position.getTime());
-        location.setFrom(from);
+        location.setNodeF(from);
 
         locationRepository.save(location);
     }

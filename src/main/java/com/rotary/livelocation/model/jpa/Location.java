@@ -20,6 +20,6 @@ public class Location {
     private String nodeId;
     private String NodeName;
     private long timestamp;
-    private String from;
+    private String nodeF;
 
 }

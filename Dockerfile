@@ -6,7 +6,7 @@ WORKDIR /app
 COPY . /app
 
 # Step 3: Build the application
-RUN mvn clean package -DskipTests
+RUN mvn package -DskipTests
 
 # Step 4: Use a lightweight Amazon Corretto image for the runtime environment
 FROM amazoncorretto:17-alpine-jdk
